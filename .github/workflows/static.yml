@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Starbucks Prep Expiration Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+      max-width: 350px;
+      background-color: #F3F6F4; /* soft, light greenish-gray */
+      color: #333;   
+      margin: 0 auto;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #00704A; /* Starbucks green */
+      color: white;
+      border: none;
+      border-radius: 8px;       /* Rounded corners */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* subtle shadow */
+      transition: transform 0.1s, box-shadow 0.1s;
+      min-width: 155px;
+      min-height: 50px;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2 columns */
+      gap: 2%; /* space between buttons */
+      justify-items: center; /* centers buttons in each column */
+      margin-bottom: 25px; /* space below grid */
+    }
+
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+      line-height: 1.75em;
+    }
+    .day-badge {
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    #footer {
+      font-size: 10px;
+
+    }
+  </style>
+  <meta name="viewport" content="user-scalable=no, width=device-width" />
+  <script src="cordova.js"></script>
+</head>
+<body>
+
+  <img src="images/logo.png" style="height: 100px; width: 100px;">
+  <h1>Starbucks Prep Expiration Calculator</h1>
+
+    <!-- Output -->
+  <hr>
+  <span id="itemName"><br><br><br><br><br></span>
+  <div id="output" class="result"></div>
+  <hr>
+
+  <!-- Cold Bar -->
+  <h3>Cold Bar:</h3>
+    <div class="button-grid">
+      <button onclick="calculateExpiration('Inclusions', { days: 5 })">Inclusions</button>
+      <button onclick="calculateExpiration('Matcha Powder', { weeks: 1 })">Matcha Powder</button>
+      <button onclick="calculateExpiration('Frappuccino Chips', { weeks: 1 })">Frappuccino Chips</button>
+      <button onclick="calculateExpiration('Vanilla Bean Powder', { weeks: 1 })">Vanilla Bean Powder</button>
+      <button onclick="calculateExpiration('Frappuccino Roast', { hours: 48 })">Frappuccino Roast</button>
+      <button onclick="calculateExpiration('Lemonade', { hours: 48 })">Lemonade</button>
+      <button onclick="calculateExpiration('Vanilla Sweet Cream', { hours: 48 })">Vanilla Sweet Cream</button>
+      <button onclick="calculateExpiration('Whipped Cream', { hours: 24 })">Whipped Cream</button>
+    </div>
+
+  <!-- Hot Bar -->
+  <h3>Hot Bar:</h3>
+    <div class="button-grid">
+      <button onclick="calculateExpiration('Chai', { hours: 24 })">Chai</button>
+      <button onclick="calculateExpiration('Mocha', { hours: 24 })">Mocha</button>
+      <button onclick="calculateExpiration('White Mocha', { weeks: 2 })">White Mocha</button>
+      <button onclick="calculateExpiration('Dark Caramel', { weeks: 2 })">Dark Caramel</button>
+      <button onclick="calculateExpiration('Caramel Drizzle Bottles', { weeks: 2 })">Caramel Drizzle</button>
+      <button onclick="calculateExpiration('Cold Brew', { weeks: 1 })">Cold Brew</button>
+    </div>
+
+  <div id="footer"><br>Designed by Hayley, for my friends at 2907 &hearts;</div>
+
+  <script>
+    // Function to round to nearest half hour
+    function roundToNearestHalfHour(date) {
+      const minutes = date.getMinutes();
+      if (minutes < 15) {
+        date.setMinutes(0, 0, 0);
+      } else if (minutes < 45) {
+        date.setMinutes(30, 0, 0);
+      } else {
+        date.setHours(date.getHours() + 1, 0, 0, 0);
+      }
+      return date;
+    }
+
+    function calculateExpiration(itemName, duration) {
+      const now = new Date();
+      const expiration = new Date(now);
+
+      // Add duration
+      if (duration.hours) {
+        expiration.setHours(expiration.getHours() + duration.hours);
+      }
+      if (duration.days) {
+        expiration.setDate(expiration.getDate() + duration.days);
+      }
+      if (duration.weeks) {
+        expiration.setDate(expiration.getDate() + duration.weeks * 7);
+      }
+
+      // Round time
+      roundToNearestHalfHour(expiration);
+
+      // Day names + colors
+      const daysOfWeek = [
+        { name: "Sunday", color: "#000" },
+        { name: "Monday", color: "#1639C9" },
+        { name: "Tuesday", color: "#E8C82E" },
+        { name: "Wednesday", color: "#D60202" },
+        { name: "Thursday", color: "#4F2F14" },
+        { name: "Friday", color: "#318208" },
+        { name: "Saturday", color: "#DE8100" }
+      ];
+
+      const dayIndex = expiration.getDay();
+      const dayName = daysOfWeek[dayIndex].name;
+      const dayColor = daysOfWeek[dayIndex].color;
+
+      // Output
+      document.getElementById("output").innerHTML =
+        `<span class="day-badge" style="background-color:${dayColor}; font-size: 16pt;">${dayName}</span><br>
+        <span style="font-size: 16pt;">${expiration.toLocaleString([], { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>`
+        ;
+
+    document.getElementById("itemName").innerHTML =
+        `<span style="font-style: italic;">${itemName}</span> expire(s) on:`;
+    }
+  </script>
+
+</body>
+</html>
